@@ -63,6 +63,25 @@ const run = async () => {
       const result = await usersCollection.insertOne(newUser);
       res.send(result);
     });
+    app.patch(`/users/:id`,async(req,res)=>{
+      const id =req.params.id
+      const filter={_id : new ObjectId(id)}
+      const modified=params.body
+      const result = {
+        $set:{
+          category:modified.category,
+          country:modified.country,
+          departureDate:modified.departureDate,
+          description:modified.description,
+          destinationName:modified.destinationName,
+          duration:modified.duration,
+          image:modified.image,
+          price:modified.price,
+          
+        }
+      }
+
+    })
     app.delete(`/users/:id`, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
