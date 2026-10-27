@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 app.use(cors());
 app.use(express.json());
@@ -23,13 +23,52 @@ const run = async () => {
     app.get("/users", async (req, res) => {
       const cursor = usersCollection.find();
       const result = await cursor.toArray();
-      res.send(result)
+      res.send(result);
     });
-    app.post('/users',async(req,res)=>{
-      const newUser = req.body
-      const result = await usersCollection .insertOne(newUser)
-      res.send(result)
-    })
+    app.get(`/users/:id`, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+    //     app.get("/users/:id", async (req, res) => {
+    //   try {
+    //     const id = req.params.id;
+
+    //     if (!ObjectId.isValid(id)) {
+    //       return res.status(400).send({
+    //         message: "Invalid user ID",
+    //       });
+    //     }
+
+    //     const query = { _id: new ObjectId(id) };
+
+    //     const result = await usersCollection.findOne(query);
+
+    //     if (!result) {
+    //       return res.status(404).send({
+    //         message: "User not found",
+    //       });
+    //     }
+
+    //     res.send(result);
+    //   } catch (error) {
+    //     res.status(500).send({
+    //       message: "Failed to fetch user",
+    //     });
+    //   }
+    // });
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      const result = await usersCollection.insertOne(newUser);
+      res.send(result);
+    });
+    app.delete(`/users/:id`, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
     await client.db("admin").command({ ping: 1 });
     console.log("deployment pinged");
   } finally {
