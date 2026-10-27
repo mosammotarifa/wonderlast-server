@@ -66,8 +66,8 @@ const run = async () => {
     app.patch(`/users/:id`,async(req,res)=>{
       const id =req.params.id
       const filter={_id : new ObjectId(id)}
-      const modified=params.body
-      const result = {
+      const modified=req.body
+      const updatedata = {
         $set:{
           category:modified.category,
           country:modified.country,
@@ -76,11 +76,11 @@ const run = async () => {
           destinationName:modified.destinationName,
           duration:modified.duration,
           image:modified.image,
-          price:modified.price,
-          
+          price:modified.price, 
         }
       }
-
+      const result = await usersCollection .updateOne(filter,updatedata)
+      res.send(result)
     })
     app.delete(`/users/:id`, async (req, res) => {
       const id = req.params.id;
