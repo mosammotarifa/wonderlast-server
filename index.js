@@ -20,6 +20,9 @@ const run = async () => {
     await client.connect();
     const db = client.db("wonderlast");
     const usersCollection = db.collection("users");
+
+    const bookingCollection = db.collection("bookinguser");
+
     app.get("/users", async (req, res) => {
       const cursor = usersCollection.find();
       const result = await cursor.toArray();
@@ -31,57 +34,48 @@ const run = async () => {
       const result = await usersCollection.findOne(query);
       res.send(result);
     });
-    //     app.get("/users/:id", async (req, res) => {
-    //   try {
-    //     const id = req.params.id;
 
-    //     if (!ObjectId.isValid(id)) {
-    //       return res.status(400).send({
-    //         message: "Invalid user ID",
-    //       });
-    //     }
-
-    //     const query = { _id: new ObjectId(id) };
-
-    //     const result = await usersCollection.findOne(query);
-
-    //     if (!result) {
-    //       return res.status(404).send({
-    //         message: "User not found",
-    //       });
-    //     }
-
-    //     res.send(result);
-    //   } catch (error) {
-    //     res.status(500).send({
-    //       message: "Failed to fetch user",
-    //     });
-    //   }
-    // });
     app.post("/users", async (req, res) => {
       const newUser = req.body;
       const result = await usersCollection.insertOne(newUser);
       res.send(result);
     });
-    app.patch(`/users/:id`,async(req,res)=>{
-      const id =req.params.id
-      const filter={_id : new ObjectId(id)}
-      const modified=req.body
+    app.get("/bookinguser/:userId", async (req, res) => {
+      const userId = req.params.userId;
+      const result = await bookingCollection.find({ userId: userId }).toArray();
+      res.send(result);
+    });
+    app.post("/bookinguser", async (req, res) => {
+      const newUser = req.body;
+      const result = await bookingCollection.insertOne(newUser);
+      res.send(result);
+    });
+        app.delete(`/bookinguser/:userId`, async (req, res) => {
+      const id = req.params.userId;
+      const query = { _id: new ObjectId(id) };
+      const result = await bookingCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.patch(`/users/:id`, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const modified = req.body;
       const updatedata = {
-        $set:{
-          category:modified.category,
-          country:modified.country,
-          departureDate:modified.departureDate,
-          description:modified.description,
-          destinationName:modified.destinationName,
-          duration:modified.duration,
-          image:modified.image,
-          price:modified.price, 
-        }
-      }
-      const result = await usersCollection .updateOne(filter,updatedata)
-      res.send(result)
-    })
+        $set: {
+          category: modified.category,
+          country: modified.country,
+          departureDate: modified.departureDate,
+          description: modified.description,
+          destinationName: modified.destinationName,
+          duration: modified.duration,
+          image: modified.image,
+          price: modified.price,
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedata);
+      res.send(result);
+    });
     app.delete(`/users/:id`, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
